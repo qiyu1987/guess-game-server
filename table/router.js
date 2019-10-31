@@ -7,12 +7,11 @@ const authMiddleware = require('../auth/middleware')
 const { toData } = require("../auth/jwt");
 // get all tables as a list
 router.get('/lobby', 
-    (req, res, next) => {
-        Table.findAll()
-            .then( 
-                tables => res.send(tables)
-            )
-            .catch(next)
+    async (req, res) => {
+        const tables = await Table.findAll()
+        const data = JSON.stringify(tables)
+        stream.updateInit(data)
+        stream.init(req, res)
     }
 )
 // get one table
