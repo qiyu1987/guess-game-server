@@ -86,10 +86,10 @@ router.put("/table/:id/join", authMiddleware, async (req, res) => {
 							payload: data
 						}
 						stream.send(action)
-						break
 					} else {
 						res.state(400).send("You have already joined table")
 					}
+					break
 				default:
 					res.status(400).send("Table not available")
 			}
@@ -100,19 +100,38 @@ router.put("/table/:id/join", authMiddleware, async (req, res) => {
 		error => console.error
 	}
 })
-// start a game --> req.body = {diceRoll1:'12345',diceRoll2:'54321'}
-router.put("/table/:id/start", async (req, res) => {
-	const table = await Table.findByPk(req.params.id, {
-		include: [{ all: true }]
-	})
-	if (table) {
-		const { player1Id } = table
-		table.update({ ...req.body, turnId: player1Id })
-		const data = JSON.stringify(table)
-		stream.send(data)
-		res.send(data)
-	} else {
-		res.status(404).end()
+// start a game
+router.put("/table/:id/start", async (req, res, next) => {
+	try {
+		const table = await Table.findByPk(req.params.id, {
+			include: [{ all: true }]
+		})
+		if (table) {
+			const diceRoll1 = Array(5)
+				.fill("")
+				.map(() => Math.round(Math.random() * 5 + 1))
+				.join("")
+				.toString()
+			const diceRoll2 = Array(5)
+				.fill("")
+				.map(() => Math.round(Math.random() * 5 + 1))
+				.join("")
+				.toString()
+			const { player1Id } = table
+			table.update({
+				diceRoll1,
+				diceRoll2,
+				turnId: player1Id,
+				status: "playing"
+			})
+			const data = JSON.stringify(table)
+			stream.send(data)
+			res.send(data)
+		} else {
+			res.status(404).end()
+		}
+	} catch (error) {
+		next(error)
 	}
 })
 // place a bid --> req.body = {bidNumber:1,bidDiceType:'3'}
