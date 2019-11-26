@@ -24,8 +24,11 @@ db.sync({ force: true })
 				{ name: "Das", status: "empty" }
 			]
 			await Table.bulkCreate(tables)
-			const user = { email: "yuki", password: bcrypt.hashSync("yuki", 10) }
-			await User.create(user)
+			const users = [
+				{ email: "yuki", password: bcrypt.hashSync("yuki", 10) },
+				{ email: "xiaodan", password: bcrypt.hashSync("xiaodan", 10) }
+			]
+			await User.bulkCreate(users)
 		} catch (error) {
 			console.log(error)
 		}

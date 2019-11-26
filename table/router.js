@@ -77,7 +77,7 @@ router.put("/table/:id/join", authMiddleware, async (req, res) => {
 				case "waiting":
 					if (table.player1Id !== req.user.userId) {
 						const newtable = await table.update({
-							status: "playing",
+							status: "ready",
 							player2Id: req.user.id
 						})
 						const data = JSON.stringify(newtable)
