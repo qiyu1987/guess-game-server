@@ -5,6 +5,7 @@ const stream = new Sse()
 const Table = require("./model")
 const User = require("../user/model")
 const authMiddleware = require("../auth/middleware")
+
 // get all tables as a list
 router.get("/lobby", async (req, res, next) => {
 	try {
@@ -152,17 +153,24 @@ router.put("/table/:id/bid", async (req, res) => {
 	}
 })
 // challenge --> req.body = {winnerId: 1}
-router.put("/table/:id/challenge", (req, res, next) => {
-	console.log("got a put request on challenge")
-	Table.findByPk(req.params.id, { include: [{ all: true }] }).then(table => {
+router.put("/table/:id/challenge", authMiddleware, async (req, res, next) => {
+	try {
+		console.log("got a put request on challenge")
+		const table = await Table.findByPk(req.params.id, {
+			include: [{ all: true }]
+		})
 		if (table) {
-			table.update({ status: "done", ...req.body })
+			const calculateWinner = require("../calculateWinner")
+			const winnerId = calculateWinner(req.user.id, table)
+			table.update({ status: "done", winnerId })
 			const data = JSON.stringify(table)
 			stream.send(data)
 			res.send(data)
 		} else {
 			res.status(404).end()
 		}
-	})
+	} catch (error) {
+		next(error)
+	}
 })
 module.exports = router
