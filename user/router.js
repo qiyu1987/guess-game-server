@@ -10,6 +10,8 @@ router.post('/signup', (req, res, next) => {
     });
   }
   const user = {
+    name: req.body.name,
+
     email: req.body.email,
 
     password: bcrypt.hashSync(req.body.password, 10)
