@@ -20,7 +20,10 @@
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.2",
     "pg": "^7.12.1",
-    "sequelize": "^5.21.1",
-    "socket.io": "^2.3.0"
+    "sequelize": "^5.21.1"
+  },
+  "engines": {
+    "node": "^13.1.0",
+    "npm": "6.12.1"
   }
 }
